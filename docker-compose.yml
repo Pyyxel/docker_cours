@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  db:
+    container_name: test_db
+    image: mariadb:10.7.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=test_db
+      - MYSQL_DATABASE=test_db
+      - MYSQL_USER=test_db
+      - MYSQL_PASSWORD=test_db
+    volumes:
+      - db:/var/lib/mysql
+      - ./docker/mariadb/conf:/etc/mysql/conf.d
+    ports:
+      - 3307:3306
+
+  web:
+    container_name: test_web
+    depends_on:
+      - db
+    build:
+      context: .
+    volumes:
+      - .:/code
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/php-config.ini
+    ports:
+      - 8000:8000
+    command: [ "symfony", "server:start" ]
+
+volumes:
+  db:
+    name: test_db
+
+networks:
+  default:
+    name: test_docker
+
+
