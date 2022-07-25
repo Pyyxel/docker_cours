@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}List{% endblock %}
+
+{% block body %}
+    {% for user in users %}
+        <p>email : {{ user.email }}</p>
+        <p>password : {{ user.password }} </p>
+    {% endfor %}
+{% endblock %}
