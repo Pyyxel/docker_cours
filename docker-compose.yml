@@ -1,39 +1,32 @@
-version: "3.7"
+version: "3.7" # version du docker compose 
 
-services:
-  db:
-    container_name: test_db
-    image: mariadb:10.7.3
-    environment:
+services: # contient l'ensemble des containeurs nécessaires
+  db: # containeur de pour notre base de donnée 
+    image: mariadb:10.7.3 # récupération de l'image via le dockerhub (docker pull)
+    environment: # variable d'envinonement pour la db 
       - MYSQL_ROOT_PASSWORD=test_db
       - MYSQL_DATABASE=test_db
       - MYSQL_USER=test_db
       - MYSQL_PASSWORD=test_db
-    volumes:
-      - db:/var/lib/mysql
-      - ./docker/mariadb/conf:/etc/mysql/conf.d
-    ports:
+    volumes: # persistance des données
+      - db:/var/lib/mysql 
+    ports: 
       - 3307:3306
 
-  web:
-    container_name: test_web
+  web: # container du server web
     depends_on:
-      - db
+      - db # depend de la db, démare le container de db avant le container web 
     build:
-      context: .
+      context: . # chemin vers Dockerfile (image)
     volumes:
-      - .:/code
-      - ./docker/php.ini:/usr/local/etc/php/conf.d/php-config.ini
+      - .:/code # notre appli est dans le dossier courant(.) mais pour le container docker il sera dans le dossier code
     ports:
       - 8000:8000
     command: [ "symfony", "server:start" ]
 
-volumes:
+volumes: # déclaration du volume pour la persistance 
   db:
-    name: test_db
+    name: db
 
-networks:
-  default:
-    name: test_docker
 
 
