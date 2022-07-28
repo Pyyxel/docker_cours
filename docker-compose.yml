@@ -7,28 +7,21 @@ services: # contient l'ensemble des containeurs nécessaires
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-
-  mongo-express:
-    image: mongo-express
-    restart: always
+  node:
+    build:
+      context: ./node 
+    user: "node"
+    working_dir: /app
+    environment:
+      - NODE_ENV=production
     ports:
       - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-
-  node:
-      image: "node:14"
-      user: "node"
-      working_dir: /home/node/app
-      environment:
-        - NODE_ENV=production
-      volumes:
-        - .:/app
-      expose:
-        - "8081"
-      command: "npm start"
+    volumes:
+      - .:/app
+    expose:
+      - "8081"
+    command: "npm start"
+        
 #   web: # container du server web
 #     depends_on:
 #       - db # depend de la db, démare le container de db avant le container web 
