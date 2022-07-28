@@ -1,32 +1,48 @@
 version: "3.7" # version du docker compose 
 
 services: # contient l'ensemble des containeurs nécessaires
-  db: # containeur de pour notre base de donnée 
-    image: mariadb:10.7.3 # récupération de l'image via le dockerhub (docker pull)
-    environment: # variable d'envinonement pour la db 
-      - MYSQL_ROOT_PASSWORD=test_db
-      - MYSQL_DATABASE=test_db
-      - MYSQL_USER=test_db
-      - MYSQL_PASSWORD=test_db
-    volumes: # persistance des données
-      - db:/var/lib/mysql 
-    ports: 
-      - 3307:3306
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 
-  web: # container du server web
-    depends_on:
-      - db # depend de la db, démare le container de db avant le container web 
-    build:
-      context: . # chemin vers Dockerfile (image)
-    volumes:
-      - .:/code # notre appli est dans le dossier courant(.) mais pour le container docker il sera dans le dossier code
+  mongo-express:
+    image: mongo-express
+    restart: always
     ports:
-      - 8000:8000
-    command: [ "symfony", "server:start" ]
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
 
-volumes: # déclaration du volume pour la persistance 
-  db:
-    name: db
+  node:
+      image: "node:14"
+      user: "node"
+      working_dir: /home/node/app
+      environment:
+        - NODE_ENV=production
+      volumes:
+        - .:/app
+      expose:
+        - "8081"
+      command: "npm start"
+#   web: # container du server web
+#     depends_on:
+#       - db # depend de la db, démare le container de db avant le container web 
+#     build:
+#       context: . # chemin vers Dockerfile (image)
+#     volumes:
+#       - .:/code # notre appli est dans le dossier courant(.) mais pour le container docker il sera dans le dossier code
+#     ports:
+#       - 8000:8000
+#     command: [ "symfony", "server:start" ]
+
+# volumes: # déclaration du volume pour la persistance 
+#   db:
+#     name: db
 
 
 
