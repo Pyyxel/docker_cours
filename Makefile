@@ -4,6 +4,7 @@ init: ## init project
 	@docker-compose run --rm web rm -rf vendor
 	@docker-compose up -d --build
 	@$(MAKE) composer-install
+	@docker-compose run --rm web php bin/console make:migration
 	@$(MAKE) resetdb
 
 down: ## down containers and remove them
